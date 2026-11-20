@@ -6,7 +6,7 @@ package Modelo;
 
 /**
  *
- * @author YESID
+ * @author Elias Torregroza
  */
 import java.time.LocalDate;
 import java.util.ArrayList;
