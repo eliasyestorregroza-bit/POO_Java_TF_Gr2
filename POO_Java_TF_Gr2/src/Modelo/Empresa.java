@@ -6,7 +6,7 @@ package Modelo;
 
 /**
  *
- * @author YESID
+ * @author Elias Torregroza
  */
 public final class Empresa extends Cliente {
     private String numeroTelefono;
