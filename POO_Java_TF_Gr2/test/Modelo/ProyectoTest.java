@@ -11,9 +11,10 @@ import static org.junit.Assert.*;
  * Pruebas unitarias (JUnit 4) de la clase Proyecto.
  * Se prueba cada camino posible de los métodos:
  *  - determinarFechaFinalizacion(): semanas, meses, años y unidad no válida.
- *  - agregarIntegrante(): con equipo existente y con equipo null.
- *  - eliminarIntegrante(): integrante encontrado, no encontrado y equipo null.
- *  - Constructor: estado null -> "INICIADO".
+ *  - agregarIntegrante() y eliminarIntegrante(): encontrado y no encontrado.
+ *  - tituloValido(): límites de 20 y 100 caracteres, espacios y null.
+ *  - duracionValida(): rangos de semanas, meses y años.
+ *  - Constructores: estado inicial, equipo vacío y equipo null.
  *
  * @author Yesid Suarez - POO_Java_TF_Gr2
  */
@@ -28,14 +29,13 @@ public class ProyectoTest {
     /** Se ejecuta ANTES de cada @Test: crea objetos nuevos para cada prueba. */
     @Before
     public void setUp() {
-        cliente = new PersonaNatural("1001", "Ana Gómez", "Cali");
+        cliente = new PersonaNatural("1001", "Ana Gómez", "Cali", "3001234567", "ana@correo.com");
         gerente = new Empleado("2001", "Luis Pérez", "Ingeniero", (byte) 10);
         integrante1 = new Empleado("3001", "María López", "Diseñadora", (byte) 3);
         integrante2 = new Empleado("3002", "Carlos Ruiz", "Programador", (byte) 5);
 
-        proyecto = new Proyecto("2026-001", "App Móvil",
-                LocalDate.of(2026, 1, 15), "meses", (byte) 6,
-                cliente, gerente, "INICIADO");
+        proyecto = new Proyecto("2026-001", "Aplicación móvil de inventarios",
+                LocalDate.of(2026, 1, 15), "meses", (byte) 6, cliente, gerente);
     }
 
     /** Se ejecuta DESPUÉS de cada @Test. */
@@ -49,30 +49,22 @@ public class ProyectoTest {
     @Test
     public void testDeterminarFechaFinalizacion_Semanas() {
         proyecto.setUnidadDuracion("semanas");
-        proyecto.setDuracionEstimada((byte) 4);
-        LocalDate esperado = LocalDate.of(2026, 2, 12); // 15 ene + 4 semanas
-        assertEquals(esperado, proyecto.determinarFechaFinalizacion());
+        proyecto.setDuracionEstimada((byte) 3);
+        // 15 ene 2026 + 3 semanas = 5 feb 2026
+        assertEquals(LocalDate.of(2026, 2, 5), proyecto.determinarFechaFinalizacion());
     }
 
     @Test
     public void testDeterminarFechaFinalizacion_Meses() {
-        // El proyecto de setUp: 15 ene 2026 + 6 meses
-        LocalDate esperado = LocalDate.of(2026, 7, 15);
-        assertEquals(esperado, proyecto.determinarFechaFinalizacion());
+        // Proyecto de setUp: 15 ene 2026 + 6 meses
+        assertEquals(LocalDate.of(2026, 7, 15), proyecto.determinarFechaFinalizacion());
     }
 
     @Test
     public void testDeterminarFechaFinalizacion_Anios() {
         proyecto.setUnidadDuracion("años");
         proyecto.setDuracionEstimada((byte) 2);
-        LocalDate esperado = LocalDate.of(2028, 1, 15);
-        assertEquals(esperado, proyecto.determinarFechaFinalizacion());
-    }
-
-    @Test
-    public void testDeterminarFechaFinalizacion_IgnoraMayusculas() {
-        proyecto.setUnidadDuracion("MESES");
-        assertEquals(LocalDate.of(2026, 7, 15), proyecto.determinarFechaFinalizacion());
+        assertEquals(LocalDate.of(2028, 1, 15), proyecto.determinarFechaFinalizacion());
     }
 
     @Test
@@ -85,21 +77,12 @@ public class ProyectoTest {
     // ---------- agregarIntegrante() ----------
 
     @Test
-    public void testAgregarIntegrante_EquipoExistente() {
+    public void testAgregarIntegrante() {
         proyecto.agregarIntegrante(integrante1);
         proyecto.agregarIntegrante(integrante2);
         assertEquals(2, proyecto.getSuEquipo().size());
-        assertTrue(proyecto.getSuEquipo().contains(integrante1));
-        assertTrue(proyecto.getSuEquipo().contains(integrante2));
-    }
-
-    @Test
-    public void testAgregarIntegrante_EquipoNull() {
-        proyecto.setSuEquipo(null);
-        proyecto.agregarIntegrante(integrante1);
-        assertNotNull(proyecto.getSuEquipo());
-        assertEquals(1, proyecto.getSuEquipo().size());
         assertSame(integrante1, proyecto.getSuEquipo().get(0));
+        assertSame(integrante2, proyecto.getSuEquipo().get(1));
     }
 
     // ---------- eliminarIntegrante() ----------
@@ -121,23 +104,54 @@ public class ProyectoTest {
         assertEquals(1, proyecto.getSuEquipo().size());
     }
 
+    // ---------- tituloValido() ----------
+
     @Test
-    public void testEliminarIntegrante_EquipoNull() {
-        proyecto.setSuEquipo(null);
-        assertNull(proyecto.eliminarIntegrante("3001"));
+    public void testTituloValido_Limites() {
+        assertFalse(Proyecto.tituloValido("a".repeat(19)));
+        assertTrue(Proyecto.tituloValido("a".repeat(20)));
+        assertTrue(Proyecto.tituloValido("a".repeat(100)));
+        assertFalse(Proyecto.tituloValido("a".repeat(101)));
+    }
+
+    @Test
+    public void testTituloValido_EspaciosYNull() {
+        // Los espacios al inicio y al final no cuentan
+        assertFalse(Proyecto.tituloValido("   App corta   "));
+        assertFalse(Proyecto.tituloValido(null));
+    }
+
+    // ---------- duracionValida() ----------
+
+    @Test
+    public void testDuracionValida_SemanasYAnios() {
+        assertTrue(Proyecto.duracionValida("semanas", 1));
+        assertTrue(Proyecto.duracionValida("semanas", 3));
+        assertFalse(Proyecto.duracionValida("semanas", 4));
+        assertTrue(Proyecto.duracionValida("años", 3));
+        assertFalse(Proyecto.duracionValida("años", 0));
+    }
+
+    @Test
+    public void testDuracionValida_Meses() {
+        assertTrue(Proyecto.duracionValida("meses", 11));
+        assertFalse(Proyecto.duracionValida("meses", 12)); // 12 meses = 1 año
+        assertTrue(Proyecto.duracionValida("meses", 13));
+        assertFalse(Proyecto.duracionValida("meses", 24));
+        assertTrue(Proyecto.duracionValida("meses", 35));
+        assertFalse(Proyecto.duracionValida("meses", 36));
+    }
+
+    @Test
+    public void testDuracionValida_UnidadNoValida() {
+        assertFalse(Proyecto.duracionValida("días", 2));
     }
 
     // ---------- Constructores ----------
 
     @Test
-    public void testConstructor_EstadoNullQuedaIniciado() {
-        Proyecto p = new Proyecto("2026-002", "Web", LocalDate.of(2026, 3, 1),
-                "semanas", (byte) 8, cliente, gerente, null);
-        assertEquals("INICIADO", p.getEstado());
-    }
-
-    @Test
-    public void testConstructor_SinEquipoCreaListaVacia() {
+    public void testConstructor_EstadoInicialYEquipoVacio() {
+        assertEquals("INICIADO", proyecto.getEstado());
         assertNotNull(proyecto.getSuEquipo());
         assertTrue(proyecto.getSuEquipo().isEmpty());
     }
@@ -146,11 +160,18 @@ public class ProyectoTest {
     public void testConstructor_ConEquipo() {
         ArrayList<Empleado> equipo = new ArrayList<>();
         equipo.add(integrante1);
-        Proyecto p = new Proyecto("2026-003", "ERP", LocalDate.of(2026, 5, 1),
-                "años", (byte) 1, cliente, gerente, equipo, "EN CURSO");
+        Proyecto p = new Proyecto("2026-002", "Plataforma web para reservas de citas",
+                LocalDate.of(2026, 3, 1), "semanas", (byte) 3, cliente, gerente, equipo);
         assertEquals(1, p.getSuEquipo().size());
-        assertEquals("EN CURSO", p.getEstado());
         assertSame(gerente, p.getSuGerente());
         assertSame(cliente, p.getSuCliente());
+    }
+
+    @Test
+    public void testConstructor_EquipoNullCreaListaVacia() {
+        Proyecto p = new Proyecto("2026-003", "Sistema de facturación electrónica",
+                LocalDate.of(2026, 5, 1), "años", (byte) 1, cliente, gerente, null);
+        assertNotNull(p.getSuEquipo());
+        assertTrue(p.getSuEquipo().isEmpty());
     }
 }
