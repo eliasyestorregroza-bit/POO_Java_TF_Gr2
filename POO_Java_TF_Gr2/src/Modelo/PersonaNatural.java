@@ -6,7 +6,7 @@ package Modelo;
 
 /**
  *
- * @author YESID
+ * @author Elias Torregroza
  */
 
 public final class PersonaNatural extends Cliente {
@@ -15,5 +15,9 @@ public final class PersonaNatural extends Cliente {
         super(numeroIdentificacion, nombre, nombreCiudad);
     }
     
-    // Getters, Setters y toString() ...
+   // Método toString
+    @Override
+    public String toString() {
+        return "Persona Natural: " + nombre + " (ID: " + numeroIdentificacion + ") - Ciudad: " + nombreCiudad;
+    }
 }
