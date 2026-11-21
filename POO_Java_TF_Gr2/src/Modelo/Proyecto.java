@@ -1,5 +1,10 @@
 package Modelo;
 
+/**
+ *
+ * @author Santiago Villabona
+ */
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 
