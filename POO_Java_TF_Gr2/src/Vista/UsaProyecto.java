@@ -31,6 +31,8 @@ import javax.swing.UIManager;
 
 /**
  * Ventana principal (JFrame) que gestiona las operaciones con los proyectos.
+ *
+ * @author Andres Cardona
  */
 public class UsaProyecto extends JFrame {
 
