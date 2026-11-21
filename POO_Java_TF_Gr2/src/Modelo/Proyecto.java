@@ -14,6 +14,8 @@ import java.util.ArrayList;
  *  - unidadDuracion: semanas, meses, años
  *  - duracionEstimada: semanas 1-3; meses 1-11, 13-23, 25-35; años 1-3
  *  - estado: por defecto INICIADO
+ *
+ * @author Santiago Villabona
  */
 public class Proyecto implements Serializable {
 
