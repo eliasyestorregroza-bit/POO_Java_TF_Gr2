@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
  *  - eliminarIntegrante(): integrante encontrado, no encontrado y equipo null.
  *  - Constructor: estado null -> "INICIADO".
  *
- * @author Grupo 2 - POO_Java_TF_Gr2
+ * @author Yesid Suarez - POO_Java_TF_Gr2
  */
 public class ProyectoTest {
 
