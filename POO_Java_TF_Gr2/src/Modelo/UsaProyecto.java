@@ -1,5 +1,10 @@
 package Vista;
 
+/**
+ *
+ * @author Andres Cardona
+ */
+
 import Modelo.*;
 import javax.swing.JOptionPane;
 import java.io.*;
